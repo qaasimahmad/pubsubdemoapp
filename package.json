@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha 'test/**/*.js'",
+    "start": "sh ./start-server.sh",
     "lint": "eslint .",
     "prepare": "husky install"
   },

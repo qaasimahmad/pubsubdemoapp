@@ -1,0 +1,70 @@
+version: '3.7'
+services:
+  publisher:
+    image: node:14.15.0
+    container_name: tqd-publisher
+    build: .
+    ports:
+      - 2300:2300
+    environment:
+     - NODE_ENV=local
+     - APP_BASE_URL=http://localhost
+     - SUBSCRIBER_PORT=2400
+     - PUBLISHER_PORT=2300
+     - ELASTIC_URL=http://elasticsearch:9200
+    volumes:
+      - .:/usr/src/app
+    command: npm run start
+    links:
+        - elasticsearch
+    depends_on:
+        - elasticsearch
+    networks: 
+      - elastic
+
+  subscriber:
+    image: node:14.15.0
+    container_name: tqd-subscriber
+    build: .
+    ports:
+      - 2400:2400
+    environment:
+     - NODE_ENV=local
+     - APP_BASE_URL=http://localhost
+     - SUBSCRIBER_PORT=2400
+     - PUBLISHER_PORT=2300
+     - ELASTIC_URL=http://elasticsearch:9200
+    volumes:
+      - .:/usr/src/app
+    command: npm run start
+    links:
+        - elasticsearch
+    depends_on:
+        - elasticsearch
+    networks: 
+      - elastic
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.15.0
+    container_name: elasticsearch
+    environment:
+      - node.name=elasticsearch
+      - cluster.name=es-docker-cluster
+      - cluster.initial_master_nodes=elasticsearch
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+      - 9300:9300
+    networks:
+      - elastic
+volumes:
+  esdata:
+networks:
+  elastic:
+    driver: bridge
