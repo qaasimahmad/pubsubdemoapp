@@ -1,7 +1,8 @@
 const assert = require('assert');
+const isArray = require('lodash/isArray');
 
 function getRoute(urls){
-  assert(Array.isArray(urls), 'array of urls expected');
+  assert(isArray(urls), 'array of urls expected');
   if(urls.length === 1){
     const route = urls[0].split('/')[3];
 
