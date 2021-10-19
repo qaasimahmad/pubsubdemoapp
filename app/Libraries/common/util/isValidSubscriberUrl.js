@@ -1,9 +1,10 @@
 const { appBaseUrl,
-  subscriberPort
+  subscriberPort,
+  publisherPort
 }              = require('../../../config/config');
 const buildUrl = require('../util/buildUrl');
 
-const subscriberUrlAplha  = `${buildUrl(appBaseUrl, subscriberPort)}/alpha`;
+const subscriberUrlAplha  = `${buildUrl(appBaseUrl, publisherPort)}/alpha`;
 const subscriberUrlBeta   = `${buildUrl(appBaseUrl, subscriberPort)}/beta`;
 const validSubscriberUrls = [subscriberUrlAplha, subscriberUrlBeta];
 

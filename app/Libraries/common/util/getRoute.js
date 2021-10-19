@@ -1,4 +1,7 @@
+const assert = require('assert');
+
 function getRoute(urls){
+  assert(Array.isArray(urls), 'array of urls expected');
   if(urls.length === 1){
     const route = urls[0].split('/')[3];
 
