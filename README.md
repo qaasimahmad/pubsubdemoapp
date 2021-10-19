@@ -34,6 +34,8 @@ Welcome to __PubSubApp__ break down
 
     * Dockerfile
 
+    * docker-compose
+
     * services
 
     - start-server.sh(Entry Script)
