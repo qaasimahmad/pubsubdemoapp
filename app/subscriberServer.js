@@ -1,7 +1,7 @@
-const express = require('express');
+const express            = require('express');
 const { subscriberPort } = require('./config/config');
-const subscriberRoute = require('./routes/subscribers');
-const logger = require('./Libraries/common/logger');
+const subscriberRoute    = require('./routes/subscribers');
+const logger             = require('./Libraries/common/logger');
 
 const app = express();
 

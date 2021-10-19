@@ -1,4 +1,4 @@
-function buildUrl(baseUrl, port) {
+function buildUrl(baseUrl, port){
   return `${baseUrl}:${port}`;
 }
 module.exports = buildUrl;

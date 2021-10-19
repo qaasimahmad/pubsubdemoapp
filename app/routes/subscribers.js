@@ -3,7 +3,6 @@ const express = require('express');
 const route = express.Router();
 
 const asyncHandler = require('express-async-handler');
-const res = require('express/lib/response');
 
 const { subscriberAlpha, subscriberBeta } = require('../controllers/subscriber');
 

@@ -1,60 +1,65 @@
 /* eslint-disable consistent-return */
-const assert = require('assert');
-const getRoute = require('../../Libraries/common/util/getRoute');
+const assert              = require('assert');
+const getRoute            = require('../../Libraries/common/util/getRoute');
 const { makePostRequest } = require('../../Libraries/request/httpRequest');
-const logger = require('../../Libraries/common/logger');
+const logger              = require('../../Libraries/common/logger');
 
-async function publishToSubscribers(urls, message) {
+async function publishToSubscribers(urls, subscribersRequest){
   assert(Array.isArray(urls), 'expecting an array');
   const urlsLength = urls.length;
+  const route      = getRoute(urls) === 'alpha' ? 'alpha' : 'beta';
+  const urlAlpha   = urls.find((item) => item.includes('alpha'));
+  const urlBeta    = urls.find((item) => item.includes('beta'));
 
-  switch (urlsLength) {
-    case 1:
-      const route = getRoute(urls) === 'alpha' ? 'alpha' : 'beta';
-      if (route === 'alpha') {
-        try {
-          const response = await publishToSubscriberAlpha(urls[0], { message });// eslint-disable-line no-use-before-define
-          return response;
-        } catch (error) {
-          return error;
-        }
-      } else {
-        const response = await publishToSubscriberBeta(urls[0]); // eslint-disable-line no-use-before-define
-        return response;
-      }
+  switch(urlsLength){
+  case 1:
+    if(route === 'alpha'){
+      const response = await publishToSubscriberAlpha(urls[0], subscribersRequest);
 
-    case 2:
-      const urlAlpha = urls.find((item) => item.includes('alpha'));
-      const urlBeta = urls.find((item) => item.includes('beta'));
-      console.log(`Two Urls Passed are ${urlAlpha}=>${urlBeta}`);
-      await publishToSubscriberAlpha(urlAlpha, { message });
-      await publishToSubscriberBeta(urlBeta, { message });
+      return response;
+    } else {
+      const response = await publishToSubscriberBeta(urls[0], subscribersRequest);
 
-    default:
-      logger.info('Oops! this case is not handled.');
+      return response;
+    }
+
+  case 2:
+    try{
+      return await Promise.allSettled(
+        [
+          publishToSubscriberAlpha(urlAlpha, subscribersRequest),
+          publishToSubscriberBeta(urlBeta, subscribersRequest)
+        ]);
+    } catch(error){
+      logger.error('Error On Making Dual Calls >>', error);
+    }
+    break;
+
+  default:
+    logger.info('Oops! this case is not handled.');
+
   }
-  try {
-    const [alphaSubscriberResponse, betaSubscriberResponse] = await Promise.allSettled([publishToSubscriberAlpha, publishToSubscriberBeta]); // eslint-disable-line no-use-before-define
-    console.log(`${JSON.stringify(alphaSubscriberResponse)}==>${JSON.stringify(betaSubscriberResponse)}`);
-  } catch (error) {
-    console.error(error);
-  }
+
 }
 
-async function publishToSubscriberAlpha(url, message) {
+async function publishToSubscriberAlpha(url, subscribersRequest){
   assert(url, 'url must be passed');
-  assert(message, 'message must be passed');
-  const response = await makePostRequest(url, message);
-  console.log('AlphaFunction', response);
-  return response;
+  assert(subscribersRequest, 'message must be passed');
+  const response = await makePostRequest(url, subscribersRequest);
+  if(response.error === false){
+    return {error: false, message: `Successfully Published to subscriber ${url}`};
+  }
+  return {error: true, message: `Publish Error!, Failed to publish to subscriber ${url}`};
 }
 
-async function publishToSubscriberBeta(url, message) {
+async function publishToSubscriberBeta(url, subscribersRequest){
   assert(url, 'url must be passed');
-  assert(message, 'message must be passed');
-  const response = await makePostRequest(url, message);
-  console.log('BetaFunction', response);
-  return response;
+  assert(subscribersRequest, 'message must be passed');
+  const response = await makePostRequest(url, subscribersRequest);
+  if(response.error === false){
+    return {error: false, message: `Successfully Published to subscriber ${url}`};
+  }
+  return {error: true, message: `Publish Error!, Failed to publish to subscriber ${url}`};
 }
 
 module.exports = publishToSubscribers;

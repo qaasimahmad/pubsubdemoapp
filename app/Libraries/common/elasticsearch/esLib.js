@@ -1,8 +1,7 @@
-const assert = require('assert');
-const elasticSearch = require('elasticsearch');
-const randomstring = require('randomstring');
-const logger = require('../logger');
-const formatResults = require('./lib/formatResults');
+const assert                      = require('assert');
+const elasticSearch               = require('elasticsearch');
+const logger                      = require('../logger');
+const formatResults               = require('./lib/formatResults');
 const { elasticUrl, index, type } = require('../../../config/config');
 
 const client = new elasticSearch.Client({
@@ -12,61 +11,60 @@ const client = new elasticSearch.Client({
 client.ping({
   requestTimeout: 30000,
 }, (error) => {
-  if (error) {
+  if(error){
     logger.error('elasticsearch cluster is down!');
   } else {
     logger.info('elasticsearch is up and running ::)');
   }
 });
 
-async function deleteIndex(index) {
+async function deleteIndex(index){
   assert(index, 'Name of the index must be specified for this operation');
-  try {
+  try{
     const result = await client.indices.delete({ index });
-    if (result) {
+    if(result){
       logger.info('index deleted successsfully');
     }
-  } catch (error) {
+  } catch(error){
     logger.error('IndexDelete Error!!', error);
     return error;
   }
 }
 
-async function saveDoc(itemsToSave) {
+async function saveDoc(itemsToSave){
   assert(itemsToSave, 'itemsToSave cannot be missing');
   const { topic } = itemsToSave;
   // Rename this variable *
   const esData = {
     index,
     type,
-    id: topic || randomstring.generate(8),
+    id:   topic,
     body: itemsToSave,
   };
-  try {
+
+  try{
     const savedResponse = await client.create(esData);
-    if (savedResponse && savedResponse.result === 'created') {
+    if(savedResponse && savedResponse.result === 'created'){
       logger.info(`successfully saved subscription data, ${JSON.stringify(savedResponse)}`);
       return 1;
     }
-  } catch (error) {
+  } catch(error){
     logger.info(`Failed to save subscription data, ${error}`);
     return 0;
   }
 }
 
-async function indexDoc(id = null, items) {
+async function indexDoc(items){
   return await client.index({
     index,
     type,
-    body: items,
-    // id,
+    body:    items,
     refresh: true,
   });
 }
 
-async function findByParam(searchParam) {
-  console.log('Searchparam>>', searchParam);
-  try {
+async function findByParam(searchParam){
+  try{
     const result = await client.search({
       index,
       type,
@@ -80,19 +78,20 @@ async function findByParam(searchParam) {
         },
       },
     });
-    if (result) {
+    if(result){
       const formattedResults = formatResults(result);
+
       return formattedResults;
     }
-  } catch (error) {
+  } catch(error){
     return error;
   }
 }
 
-async function createIndex(indexName) {
-  try {
+async function createIndex(indexName){
+  try{
     await client.indices.create(indexName);
-  } catch (error) {
+  } catch(error){
     return error;
   }
 }

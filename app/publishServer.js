@@ -1,9 +1,10 @@
-const express = require('express');
+const express           = require('express');
 const { publisherPort } = require('./config/config');
+
 require('dotenv').config();
-const publishRoute = require('./routes/publish');
+const publishRoute      = require('./routes/publish');
 const subscriptionRoute = require('./routes/subscription');
-const logger = require('./Libraries/common/logger');
+const logger            = require('./Libraries/common/logger');
 
 const app = express();
 
