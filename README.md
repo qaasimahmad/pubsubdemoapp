@@ -139,13 +139,13 @@ subscription| /subscribe/:topic (POST)
 
 
 # subscription
-
-- This returns the shortened Url and a message
+resource: "http://localhost:2300/subscribe/topic4"
 
 _Sample POST request to create New Client
-resource: "http://localhost:2300/subscribe/topic4"
-~~~~
 
+~~~~
+url: http://localhost:2400/beta
+~~~~
 *Required Fields*
 url
 
