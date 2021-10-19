@@ -54,7 +54,7 @@ npm install
 **Start App**
 - At the base of the project, run the command below
 ```
-sh ./start-server.sh
+npm run start
 ```
 - Two servers will start at once. (publisher and subscriber)
 - Publisher runs on Port 2300
