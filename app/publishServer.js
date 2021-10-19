@@ -1,12 +1,18 @@
-const express           = require('express');
-const { publisherPort } = require('./config/config');
+const express                  = require('express');
+const { publisherPort, index } = require('./config/config');
 
 require('dotenv').config();
 const publishRoute      = require('./routes/publish');
 const subscriptionRoute = require('./routes/subscription');
 const logger            = require('./Libraries/common/logger');
+const { createIndex }   = require('../app/Libraries/common/elasticsearch/esLib');
 
 const app = express();
+
+(async()=>{
+  await createIndex(index);
+})()
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

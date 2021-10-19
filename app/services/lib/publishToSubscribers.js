@@ -1,11 +1,12 @@
 /* eslint-disable consistent-return */
 const assert              = require('assert');
+const isArray             = require('lodash/isArray');
 const getRoute            = require('../../Libraries/common/util/getRoute');
 const { makePostRequest } = require('../../Libraries/request/httpRequest');
 const logger              = require('../../Libraries/common/logger');
 
 async function publishToSubscribers(urls, subscribersRequest){
-  assert(Array.isArray(urls), 'expecting an array');
+  assert(isArray(urls), 'expecting an array');
   const urlsLength = urls.length;
   const route      = getRoute(urls) === 'alpha' ? 'alpha' : 'beta';
   const urlAlpha   = urls.find((item) => item.includes('alpha'));

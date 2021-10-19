@@ -88,14 +88,26 @@ async function findByParam(searchParam){
   }
 }
 
+async function isExistIndex(indexName){
+  return await client.indices.exists({index: indexName});
+}
+
 async function createIndex(indexName){
   try{
-    await client.indices.create(indexName);
+    const isIndexExists = await client.indices.exists({index: indexName});
+    if(!isIndexExists){
+      const isCreated = await client.indices.create({index: indexName});
+
+      return logger.info(`index successfully created ${isCreated}`);
+    } else {
+      return logger.info(`index ${indexName} already exists`);
+    }
+
   } catch(error){
     return error;
   }
 }
 
 module.exports = {
-  deleteIndex, createIndex, indexDoc, client, findByParam, saveDoc,
+  deleteIndex, createIndex, indexDoc, client, findByParam, saveDoc, isExistIndex
 };

@@ -1,14 +1,18 @@
 /* eslint-disable no-undef*/
-const { deleteIndex, indexDoc } = require('../../app/Libraries/common/elasticsearch/esLib');
-const chai                      = require('chai');
+const { deleteIndex, indexDoc, createIndex } = require('../../app/Libraries/common/elasticsearch/esLib');
+const chai                                   = require('chai');
 
 const { expect }                            = chai;
 const publishMesageToSubscribers            = require('../../app/services/publisher');
 const buildUrl                              = require('../../app/Libraries/common/util/buildUrl');
 const { appBaseUrl, subscriberPort, index } = require('../../app/config/config');
 
-before(async() => {
+beforeEach(async() => {
   await deleteIndex(index);
+});
+
+after(async() => {
+  await createIndex(index);
 });
 
 describe('Pub Sub App', () => {
@@ -16,6 +20,7 @@ describe('Pub Sub App', () => {
   const topic2                = 'topic2';
   const topicDefault          = 'topicDefault';
   const topic3                = 'topic3';
+  const topic4                = 'topic4';
   const subscriberUrl1        = `${buildUrl(appBaseUrl, subscriberPort)}/alpha`;
   const subscriberUrl2Valid   = `${buildUrl(appBaseUrl, subscriberPort)}/beta`;
   const subscriberUrl2inValid = `${buildUrl(appBaseUrl, subscriberPort)}/betas`;
@@ -44,18 +49,10 @@ describe('Pub Sub App', () => {
     url:   subscriberUrl2inValid
   };
 
-  // describe('save new topic and generated subscriber url', () => {
-  //   it('should return an object on successful subscription', async() => {
-  //     const result   = await saveSubscriptionDetails(subscriptionDataDefault);
-  //     const expected = {
-  //       error: false,
-  //       message: `subscription to topic ${topicDefault} successful`,
-  //       data: {url: subscriberUrl1, topic: topicDefault}
-  //     };
-
-  //     expect(result).deep.equals(expected);
-  //   });
-  // });
+  const subscriptionDataNullUrl = {
+    topic: topic4,
+    url:   null
+  }
 
   describe('save new topic and generated subscriber url', () => {
     it('should return an object on successful subscription', async() => {
@@ -79,22 +76,31 @@ describe('Pub Sub App', () => {
 
         expect(result).to.deep.equal(expected);
       }
-    }).timeout(5000);
-  });
-
-  describe('publish message to a subscriber per topic', () => {
-    const message = 'Hello publisher';
-    const {url}   = subscriptionData3inValid;
+    });
 
     it('should return error if an error exists', async() => {
       const savedResult = await indexDoc(subscriptionData3inValid);
+      const {url}       = subscriptionData3inValid;
       if(savedResult.result){
         const result   = await publishMesageToSubscribers(topic3, message);
         const expected = {error: true, message: `Publish Error!, Failed to publish to subscriber ${url}`};
 
         expect(result).to.deep.equal(expected);
       }
-    }).timeout(5000);
+    });
+
+    it('should publish publish even without a subscriberUrl', async() => {
+      const savedResult = await indexDoc(subscriptionDataNullUrl);
+      if(savedResult.result){
+        const result   = await publishMesageToSubscribers(topic4, message);
+        const expected = {
+          error:   false,
+          message: `Successfully Published to "null" subscribers. <No subscribers url associated with topic <${topic4}>`
+        };
+
+        expect(result).to.deep.equal(expected);
+      }
+    });
   });
 
   describe('publish message to multiple subscribers per topic', () => {
@@ -113,7 +119,7 @@ describe('Pub Sub App', () => {
           expect(result).to.deep.equal(expected);
         }
       }
-    }).timeout(5000);
+    });
   });
 
 });

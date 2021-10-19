@@ -1,42 +1,49 @@
-const assert = require('assert');
-const esLib = require('../Libraries/common/elasticsearch/esLib');
-// const logger = require('../Libraries/common/logger');
-const getSubscriberUrls = require('./lib/getSubsriberUrls');
+const assert               = require('assert');
+const isArray              = require('lodash/isArray');
+const esLib                = require('../Libraries/common/elasticsearch/esLib');
+const getSubscriberUrls    = require('./lib/getSubsriberUrls');
 const publishToSubscribers = require('./lib/publishToSubscribers');
-const { indexDoc } = require('../Libraries/common/elasticsearch/esLib');
 
-async function publishMesageToSubscribers(topic, message) {
-  console.log('Message Passed', message);
+async function publishMesageToSubscribers(topic, message){
   assert(topic, 'topic is required');
   assert(message, 'message is required');
-  const searchParam = { 'topic.keyword': topic };
+  const searchParam         = { 'topic.keyword': topic };
   const subscriptionDetails = await esLib.findByParam(searchParam);
-  console.log('isExits >>', subscriptionDetails);
+  const subscribersRequest  = {
+    topic,
+    data: {
+      info: message
+    }
 
-  if (subscriptionDetails) {
-    const subscriberUrls = getSubscriberUrls(subscriptionDetails);
-    if (subscriberUrls.length > 0) {
-      const publishedResults = await publishToSubscribers(subscriberUrls, message);
-      console.log('OnPublished ::', publishedResults);
-      return publishedResults;
+  }
+
+  if(subscriptionDetails){
+    const subscriberUrls         = getSubscriberUrls(subscriptionDetails);
+    const subscriberUrlsFiltered = subscriberUrls.filter(item => item != null);
+    if(subscriberUrlsFiltered.length > 0){
+      try{
+        const publishedResults = await publishToSubscribers(subscriberUrlsFiltered, subscribersRequest);
+        if(isArray(publishedResults) && publishedResults.length === 2){
+          if(publishedResults[0].status === 'rejected' || publishedResults[1].status === 'rejected'){
+            return {error: true, message: 'Publish Error!, unable to fulfil publish request to the subscriber'};
+          } else {
+            return {error: false, message: `Successfully Published to subscribers ${subscriberUrlsFiltered}`};
+          }
+        }
+        return publishedResults;
+      } catch(error){
+        return error;
+      }
+
+    } else {
+      return {
+        error:   false,
+        message: `Successfully Published to "null" subscribers. <No subscribers url associated with topic <${topic}>`
+      };
     }
   } else {
-    // TODO: If no subscriberUrl, just save the topic in the Db with subscriber url as null
-    const item = {
-      topic,
-      url: null,
-    };
-    const indexedResponse = await indexDoc(topic, item);
-    if (indexedResponse.result) {
-      return console.log('No_Sub_Url Found, but never mind, we have your topic :)');
-    }
+    return {error: true, message: `No record with topic ${topic} found`};
   }
 }
-/*
-- get the topic
-- check if topic exists-YES-fetch all urls associated with it.
-- make http call(s) to the url(s);
-- else just save the topic in the Db with subscriber url as null
-*/
 
 module.exports = publishMesageToSubscribers;

@@ -1,8 +1,9 @@
 const subscriptionService = require('../services/subscription');
 
 async function subscribeToTopics(req, res){
-  const {url}              = req.body;
-  const {topic}            = req.params;
+  const {url}   = req.body || null;
+  const {topic} = req.params;
+  if(!topic) return res.status(422).json('topic is required as a path param');
   const subscriptionData   = {
     topic: topic,
     url
