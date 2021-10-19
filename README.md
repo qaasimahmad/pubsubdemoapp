@@ -145,8 +145,6 @@ subscription| /subscribe/:topic (POST)
 _Sample POST request to create New Client
 resource: "http://localhost:2300/subscribe/topic4"
 ~~~~
-url: "http://localhost:2400/beta"
-~~~~
 
 *Required Fields*
 url
