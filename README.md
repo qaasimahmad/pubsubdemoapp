@@ -104,7 +104,7 @@ run source .env on your shell to make those variables available for use on your 
 # Subscribers: These are just listeners that respond to messages sent to them by the publisher.
 - In this codebase, In order for the subscriber to receive the request, Http request using `axios` is made to a subscriber by the publisher.
 - Since it's a demo, I have limited the number of subscribers to `2` to be able to manage the http calls.
-- There are `two subscriber urls pre-configured` over which the publisher can Ping the subscribers.
+- There are `two subscriber urls` over which the publisher can Ping the subscribers.
 - On receiving an http request, a log is displayed to indicate that it has indeed been notified.
 - The subscribers have been define in this app as `routes` that can be called via `POST` method.
 
