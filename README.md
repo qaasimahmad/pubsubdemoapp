@@ -118,8 +118,8 @@ run source .env on your shell to make those variables available for use on your 
 - Represented by a route
 - A publish request is made via an http call to `/publish/:topic` route with toic as a path param.
 - The publisher notifies the `subscriber endpoint` which `matches` the `topic`; 
-- So if a record exists say topic = 'topic1', subscriberUrl = 'http://localhost:2400/alpha' (`alpha`) is a name of one of the subscriber's route(`/alpha`). A pblisher would only PING the exact `subscribeUrl`. 
-- Also if a topic belongs to `more than one` *subscriberUrl* say subscriberUrl = 'http://localhost:2400/beta' (`beta`) is a name of another subscriberUrl, `two` requests are made to `each` of the subscribers to `Notify them`.
+- So if a record exists say topic = 'topic1', subscriberUrl = 'http://localhost:2400/alpha' (`alpha`) is a name of one of the subscriber's route(`/alpha`). A pblisher would only PING the exact subscribeUrl as indicated above(`http://localhost:2400/alpha`). 
+- Also if a topic belongs to `more than one` *subscriberUrl* say subscriberUrl = `http://localhost:2400/beta` (`beta`) is a name of another subscriberUrl and `http://localhost:2400/alpha`, `two` requests are made to `each` of the subscribers to `Notify them`.
 - If a topic to be published to does not have a subscriberUrl associated to it, a `successful response` is still returned.
 
 # Tests:
