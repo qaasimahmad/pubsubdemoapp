@@ -1,4 +1,4 @@
-const assert = require('assert');
+const assert  = require('assert');
 const isArray = require('lodash/isArray');
 
 function getRoute(urls){
