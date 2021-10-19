@@ -34,8 +34,7 @@ async function deleteIndex(index){
 async function saveDoc(itemsToSave){
   assert(itemsToSave, 'itemsToSave cannot be missing');
   const { topic } = itemsToSave;
-  // Rename this variable *
-  const esData = {
+  const data      = {
     index,
     type,
     id:   topic,
@@ -43,7 +42,7 @@ async function saveDoc(itemsToSave){
   };
 
   try{
-    const savedResponse = await client.create(esData);
+    const savedResponse = await client.create(data);
     if(savedResponse && savedResponse.result === 'created'){
       logger.info(`successfully saved subscription data, ${JSON.stringify(savedResponse)}`);
       return 1;
