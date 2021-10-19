@@ -37,7 +37,8 @@ async function publishToSubscribers(urls, subscribersRequest){
     break;
 
   default:
-    logger.info('Oops! this case is not handled.');
+    logger.info('Oops! un suported scenario.');
+    return {error: true, message: 'Oops!, no support for the scenario'};
 
   }
 
